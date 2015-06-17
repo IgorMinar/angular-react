@@ -14,10 +14,15 @@ var ReactNativeEventEmitter = require('ReactNativeEventEmitter');
 ReactNativeEventEmitter.receiveEvent = function(
 	tag: number,
 	topLevelType: string,
-	nativeEventParam: Object
+	nativeEventParam
 ) {
+	if (!nativeEventParam.target) {
+		throw "Expected all events to have a target!";
+	}
+	var element = tagElementMap[tag];
+	nativeEventParam.target = element;
 	console.log(tag, topLevelType.toLowerCase(), nativeEventParam);
-	tagElementMap[tag].listenerCallback(topLevelType.toLowerCase(), nativeEventParam);
+	element.listenerCallback(topLevelType.toLowerCase(), nativeEventParam);
 	// TODO: Don't call detectChanges on events that are not listened to.
 	detectChanges();
 }
@@ -38,29 +43,70 @@ var parse5Adapter = require('angular2/src/dom/parse5_adapter.js');
 require('traceur/bin/traceur-runtime.js');
 require('reflect-metadata/Reflect.js');
 
-import {Component, View, bootstrap, bind, Renderer, appComponentRefToken} from 'angular2/angular2';
+import {Component, View, bootstrap, bind, Renderer, appComponentRefToken, NgFor} from 'angular2/angular2';
 import {internalView} from 'angular2/src/core/compiler/view_ref';
 
 import {ReactNativeRenderer} from './renderer'
 
+
+@Component({
+	selector: 'checkbox',
+	hostAttributes: {
+		margin: 5,
+		width: 20,
+		height: 20
+	}
+})
+@View({
+	template: ''
+})
+class CheckboxComponent {
+
+}
+
+
 @Component({
 	selector: 'hello-world',
 	hostAttributes: {
-		"flex": 1,
-		"justifyContent": "center",
-		"alignItems": "center",
-		"backgroundColor": "#F5FCFF"
+		"position": "absolute",
+		"top": 0,
+		"bottom": 0,
+		"left": 0,
+		"right": 0,
+		"padding": 5,
+		"paddingTop": 15
 	}
 })
 @View({
 	template:
-		  "<TextField height='40' fontSize='40' (topChange)='myText = $event.text' alignSelf='stretch' placeholder='Name'></TextField>"
-		+ "<Text>Hello, {{myText}}!</Text>",
-	directives: []
+		  "<TextField (topsubmitediting)='submit($event)' placeholder='new item' height=40 fontSize=30></TextField>"
+		+ "<View *ng-for='#item of items'>"
+			+ "<checkbox></checkbox>"
+			+ "<Text>{{item.label}}</Text>"
+		+ "</View>",
+	directives: [NgFor, CheckboxComponent]
 })
 class HelloWorldComponent {
 	myText = "";
+	items = []
+	submit(event) {
+		this.items.push({"label": event.text});
+		event.target.setAttribute("text", "");
+		event.target.focus();
+	}
 }
+
+
+
+
+
+
+
+
+
+
+
+
 
 var detectChanges = () => { };
 

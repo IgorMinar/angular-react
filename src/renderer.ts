@@ -56,6 +56,16 @@ export class ReactNativeRenderer extends Renderer {
 
 	attachViewInContainer(parentViewRef: RenderViewRef, boundElementIndex: number, atIndex: number, viewRef: RenderViewRef) {
 		console.log("attachViewInContainer", arguments);
+		var parentView = resolveInternalReactNativeView(parentViewRef);
+		var view = resolveInternalReactNativeView(viewRef);
+		var siblingElement = parentView.boundElements[boundElementIndex];
+		var siblingIndex = siblingElement.parent.children.indexOf(siblingElement);
+		var desiredIndex = (siblingIndex + 1) + atIndex;
+		if (view.rootChildElements.length != 1) {
+			console.log("%cExpected one element, got " + view.rootChildElements.length, "color: #FF0000");
+		}
+		var elementToInsert = view.rootChildElements[0];
+		siblingElement.parent.insertChildAtIndex(elementToInsert, desiredIndex);
 	}
 
 	detachViewInContainer(parentViewRef: RenderViewRef, boundElementIndex: number, atIndex: number, viewRef: RenderViewRef) {
@@ -139,7 +149,7 @@ export class ReactNativeRenderer extends Renderer {
 			}
 
 			//create and then attach children
-			if (node.children) {
+			if (node.children && node.name != "template") {
 				var children = this._dfsAndCreateNativeElements(node.children, boundElements);
 				for (var j = 0; j < children.length; j++) {
 					var child = children[j];

@@ -222,8 +222,9 @@ export var tagElementMap = {};
 export class ReactNativeElement {
 	tag;
 	viewName;
-	children = [];
-	listenerCallback: Function;
+	parent: ReactNativeElement;
+	children:Array<ReactNativeElement> = [];
+	listenerCallback = (name, event) => {};
 	constructor(viewName: string, attributes = {}) {
 		var nativeViewName = RCT_VIEW_NAMES[viewName];
 		if (nativeViewName == undefined) {
@@ -243,8 +244,9 @@ export class ReactNativeElement {
 		tagElementMap[this.tag] = this;
 	}
 
-	insertChildAtIndex(node, index) {
+	insertChildAtIndex(node: ReactNativeElement, index: number) {
 		this.children.splice(index, 0, node);
+		node.parent = this;
 		NativeModules.UIManager.manageChildren(this.tag, null, null, [node.tag], [index], null);
 	}
 
@@ -256,5 +258,9 @@ export class ReactNativeElement {
 
 	attachToNative() {
 		NativeModules.UIManager.manageChildren(1, null, null, [this.tag], [0], null);
+	}
+
+	focus() {
+		NativeModules.UIManager.focus(this.tag);
 	}
 }
