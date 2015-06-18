@@ -1,12 +1,9 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- */
 'use strict';
 import {tagElementMap} from "./native_element";
 
 var AppRegistry = require('AppRegistry');
 var ReactNativeEventEmitter = require('ReactNativeEventEmitter');
+
 //replacing the event handlers.
 //This is better than replacing the module itself, because
 //react native's packager gets confused if you have two packages 
@@ -49,35 +46,10 @@ import {internalView} from 'angular2/src/core/compiler/view_ref';
 import {ReactNativeRenderer} from './renderer'
 
 
-@Directive({
-	selector: 'checkbox',
-	hostAttributes: {
-		margin: 2,
-		width: 14,
-		height: 14,
-		borderWidth: 1,
-		marginRight: 10
-	},
-	hostProperties: {
-		'backgroundColor': 'backgroundColor'
-	},
-	hostListeners: {
-		
-	},
-	properties: [
-		"checked"
-	]
-})
-class CheckboxComponent {
-	backgroundColor: string;
-	set checked(newValue:boolean) {
-		this.backgroundColor = newValue ? "#000000" : undefined;
-	}
-}
 
 
 @Component({
-	selector: 'hello-world',
+	selector: 'todo-app',
 	hostAttributes: {
 		"position": "absolute",
 		"top": 0,
@@ -97,9 +69,9 @@ class CheckboxComponent {
 				+ "<Text fontSize=20>{{item.label}}</Text>"
 			+ "</View>"
 		+ "</View></ScrollView>",
-	directives: [NgFor, CheckboxComponent]
+	directives: [NgFor]
 })
-class HelloWorldComponent {
+class TodoAppComponent {
 	myText = "";
 	items = [];
 	submit(event) {
@@ -114,22 +86,12 @@ class HelloWorldComponent {
 
 
 
-
-
-
-
-
-
-
-
-
-
 var detectChanges = () => { };
 
 AppRegistry.registerRunnable("dist", function() {
 	parse5Adapter.Parse5DomAdapter.makeCurrent();
 
-	bootstrap(HelloWorldComponent, [
+	bootstrap(TodoAppComponent, [
 		ReactNativeRenderer,
 		bind(Renderer).toAlias(ReactNativeRenderer)
 	]).then( (appRef) => {

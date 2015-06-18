@@ -8,7 +8,7 @@ gulp.task('watchbuild', function() {
 });
 
 gulp.task('build', shell.task([
-	'tsc -p src',
+        "../angular/node_modules/.bin/tsc -p src",
 	"find dist -not \\( -path dist/node_modules -prune \\) -name '*.js' -type f -exec sed -i '' -e '$a\\' {} \\;",
 ]));
 
@@ -27,7 +27,7 @@ gulp.task('init', shell.task([
 	"cp -r crypto/ dist/node_modules/crypto",
 
 	"cp -r angular/modules/angular2/ src/angular2/",
-	"tsc -p src",
+        "../angular/node_modules/.bin/tsc -p src",
 		"mv dist/node_modules/angular2/package.json tmp",
 	"rm -r dist/node_modules/angular2",
 	"mv dist/angular2 dist/node_modules/angular2",
