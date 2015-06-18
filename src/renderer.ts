@@ -73,8 +73,7 @@ export class ReactNativeRenderer extends Renderer {
 		var siblingElement = parentView.boundElements[boundElementIndex];
 		var siblingIndex = siblingElement.parent.children.indexOf(siblingElement);
 		var desiredIndex = (siblingIndex + 1) + atIndex;
-		var node = siblingElement.parent.children[desiredIndex];
-		siblingElement.parent.removeChild(node);
+		siblingElement.parent.removeAtIndex(desiredIndex);
 	}
 
 	hydrateView(viewRef: RenderViewRef) {
