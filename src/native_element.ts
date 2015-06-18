@@ -250,7 +250,12 @@ export class ReactNativeElement {
 		NativeModules.UIManager.manageChildren(this.tag, null, null, [node.tag], [index], null);
 	}
 
-	setAttribute(attribute, value) {
+	removeChild(node: ReactNativeElement) {
+		this.children.splice(this.children.indexOf(node), 1)[0].parent = null;
+		detachedRoot.insertChildAtIndex(node, detachedRoot.children.length);
+	}
+
+	setProperty(attribute, value) {
 		var props = {};
 		props[RCT_PROPERTY_NAMES[attribute] || attribute] = value;
 		NativeModules.UIManager.updateView(this.tag, this.viewName, props);
@@ -264,3 +269,7 @@ export class ReactNativeElement {
 		NativeModules.UIManager.focus(this.tag);
 	}
 }
+
+//using this because UIManager.manageChildren will "purge" any
+//removed elements. Instead, I just put them here.
+var detachedRoot = new ReactNativeElement("RCTView");

@@ -33,8 +33,6 @@ export class ReactNativeRenderer extends Renderer {
 
 	destroyView(viewRef: RenderViewRef) {
 		console.log("destroyView", arguments);
-		// DomRenderer had "noop for now", so, uh...
-		// noop for now
 	}
 
 	attachComponentView(hostViewRef: RenderViewRef, elementIndex: number,
@@ -70,6 +68,13 @@ export class ReactNativeRenderer extends Renderer {
 
 	detachViewInContainer(parentViewRef: RenderViewRef, boundElementIndex: number, atIndex: number, viewRef: RenderViewRef) {
 		console.log("detachViewInContainer", arguments);
+		var parentView = resolveInternalReactNativeView(parentViewRef);
+		var view = resolveInternalReactNativeView(viewRef);
+		var siblingElement = parentView.boundElements[boundElementIndex];
+		var siblingIndex = siblingElement.parent.children.indexOf(siblingElement);
+		var desiredIndex = (siblingIndex + 1) + atIndex;
+		var node = siblingElement.parent.children[desiredIndex];
+		siblingElement.parent.removeChild(node);
 	}
 
 	hydrateView(viewRef: RenderViewRef) {
@@ -91,7 +96,7 @@ export class ReactNativeRenderer extends Renderer {
 		console.log("setElementProperty", arguments);
 		var view = resolveInternalReactNativeView(viewRef);
 		var element = view.boundElements[elementIndex];
-		element.setAttribute(propertyName, propertyValue);
+		element.setProperty(propertyName, propertyValue);
 	}
 
 	callAction(viewRef: RenderViewRef, elementIndex: number, actionExpression: string, actionArgs: any) {
@@ -101,7 +106,7 @@ export class ReactNativeRenderer extends Renderer {
 	setText(viewRef: RenderViewRef, textNodeIndex: number, text: string) {
 		console.log("setText", arguments);
 		var view = resolveInternalReactNativeView(viewRef);
-		view.boundTextNodes[textNodeIndex].setAttribute("text", text);
+		view.boundTextNodes[textNodeIndex].setProperty("text", text);
 	}
 
 	setEventDispatcher(viewRef: RenderViewRef, dispatcher: EventDispatcher) {
@@ -114,7 +119,7 @@ export class ReactNativeRenderer extends Renderer {
 		console.log(proto);
 		var nativeElements;
 		var boundElements = [];
-		if (proto.rootBindingOffset == 0) {
+		if (proto.element.name == "template") {
 			nativeElements = this._dfsAndCreateNativeElements(proto.element.children[0].children, boundElements);
 		} else {
 			nativeElements = this._dfsAndCreateNativeElements([proto.element], boundElements);

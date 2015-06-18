@@ -43,25 +43,36 @@ var parse5Adapter = require('angular2/src/dom/parse5_adapter.js');
 require('traceur/bin/traceur-runtime.js');
 require('reflect-metadata/Reflect.js');
 
-import {Component, View, bootstrap, bind, Renderer, appComponentRefToken, NgFor} from 'angular2/angular2';
+import {Component, View, Directive, bootstrap, bind, Renderer, appComponentRefToken, NgFor} from 'angular2/angular2';
 import {internalView} from 'angular2/src/core/compiler/view_ref';
 
 import {ReactNativeRenderer} from './renderer'
 
 
-@Component({
+@Directive({
 	selector: 'checkbox',
 	hostAttributes: {
-		margin: 5,
-		width: 20,
-		height: 20
-	}
-})
-@View({
-	template: ''
+		margin: 2,
+		width: 14,
+		height: 14,
+		borderWidth: 1,
+		marginRight: 10
+	},
+	hostProperties: {
+		'backgroundColor': 'backgroundColor'
+	},
+	hostListeners: {
+		
+	},
+	properties: [
+		"checked"
+	]
 })
 class CheckboxComponent {
-
+	backgroundColor: string;
+	set checked(newValue:boolean) {
+		this.backgroundColor = newValue ? "#000000" : undefined;
+	}
 }
 
 
@@ -80,19 +91,24 @@ class CheckboxComponent {
 @View({
 	template:
 		  "<TextField (topsubmitediting)='submit($event)' placeholder='new item' height=40 fontSize=30></TextField>"
-		+ "<View *ng-for='#item of items'>"
-			+ "<checkbox></checkbox>"
-			+ "<Text>{{item.label}}</Text>"
-		+ "</View>",
+		+ "<ScrollView flex=1><View>" 
+			+ "<View *ng-for='#item of items' flexDirection='row' height=40 fontSize=20 alignItems='center'>"
+				+ "<switch width=61 height=31 paddingRight=10 (topchange)='remove(item)'></switch>"
+				+ "<Text fontSize=20>{{item.label}}</Text>"
+			+ "</View>"
+		+ "</View></ScrollView>",
 	directives: [NgFor, CheckboxComponent]
 })
 class HelloWorldComponent {
 	myText = "";
-	items = []
+	items = [];
 	submit(event) {
 		this.items.push({"label": event.text});
-		event.target.setAttribute("text", "");
-		event.target.focus();
+		event.target.setProperty("text", "");
+	}
+	remove(item) {
+		console.log(this.items, this.items.indexOf(item))
+		this.items.splice(this.items.indexOf(item), 1)
 	}
 }
 
